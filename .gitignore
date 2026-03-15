@@ -1,0 +1,22 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+
+# Windows specifics
+Thumbs.db
+desktop.ini
+
+# Project specific
+testfiles/
+*.log
+temp_converted_files/
+
+# IDEs
+.vscode/
+.idea/
