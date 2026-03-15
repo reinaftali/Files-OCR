@@ -7,6 +7,7 @@ __pycache__/
 .venv/
 venv/
 ENV/
+.env
 
 # Windows specifics
 Thumbs.db
@@ -16,6 +17,7 @@ desktop.ini
 testfiles/
 *.log
 temp_converted_files/
+final_report.csv
 
 # IDEs
 .vscode/

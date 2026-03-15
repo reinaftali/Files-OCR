@@ -4,6 +4,8 @@ from .word import get_docx_page_generator, convert_doc_to_docx_windows
 from .tabular import get_csv_page_generator, get_excel_page_generator, convert_xls_to_xlsx_windows
 from .ocr_engine import run_tesseract_ocr
 
+SUPPORTED_EXTENSIONS = ('.pdf', '.docx', '.doc', '.csv', '.xlsx', '.xls')
+
 def get_combined_page_iterator(file_path):
     _, file_extension = os.path.splitext(file_path)
     ext = file_extension.lower().strip('.')
