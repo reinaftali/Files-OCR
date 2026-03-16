@@ -47,6 +47,8 @@ def process_and_search(document_id, page_iterator, phrases_to_find, overlap_size
     results = {phrase: False for phrase in phrases_to_find}
     
     for page_number, current_page_text in enumerate(page_iterator, start=1):
+        print(f"\n[DEBUG] Text found on page {page_number}:")
+        print(f"'{current_page_text}'")
         # Short-circuit: Stop processing the file if all phrases have been found
         if not pending_phrases:
             # All phrases found, no need to keep reading/OCR-ing the rest of the file

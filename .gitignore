@@ -18,6 +18,8 @@ testfiles/
 *.log
 temp_converted_files/
 final_report.csv
+test/
+*.pdf_temp
 
 # IDEs
 .vscode/
