@@ -64,7 +64,19 @@ def generate_final_report(db_config, output_csv_path="final_report.csv"):
     print(f"    [V] Report saved to: {output_csv_path}")
 
 def main():
-    phrases = ["קפה הפוך", "טכנולוגיה", "טיול בטבע", "מחשב נייד", "פיצה"] 
+    raw_phrases = os.getenv("SEARCH_PHRASES")
+    if not raw_phrases:
+        print("[!] Error: 'SEARCH_PHRASES' is not set in your .env file.")
+        print("    Please add: SEARCH_PHRASES=phrase1,phrase2... to your .env")
+        return # Stop, phrases are mandatory
+
+    phrases = [p.strip() for p in raw_phrases.split(",") if p.strip()]
+
+    # check the list isn't just empty commas (e.g., ",,,")
+    if not phrases:
+        print("[!] Error: 'SEARCH_PHRASES' was found but contains no valid phrases.")
+        return
+        
     db = DatabaseManager(DB_CONFIG)
     
     print(f"[*] Starting End-to-End Pipeline on {FOLDER_PATH}...\n")
