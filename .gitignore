@@ -12,6 +12,7 @@ ENV/
 # Windows specifics
 Thumbs.db
 desktop.ini
+final_report.csv
 
 # Project specific
 testfiles/

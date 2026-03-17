@@ -27,10 +27,10 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: POSTGRES_USER
-          value: "user"
+          value: "REPLACE_WITH_DB_USER"
         - name: POSTGRES_PASSWORD
-          value: "password123"
+          value: "REPLACE_WITH_DB_PASSWORD"
         - name: POSTGRES_DB
-          value: "doc_db"
+          value: "REPLACE_WITH_DB_NAME"
         ports:
         - containerPort: 5432
