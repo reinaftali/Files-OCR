@@ -25,56 +25,65 @@ def _build_robust_pattern(phrase):
     return re.compile(r'\s+'.join(flexible_words))
 
 
-def process_and_search(document_id, page_iterator, phrases_to_find, overlap_size=150):
+def process_and_search(document_id, page_iterator, search_dict, overlap_size=150):
     """
-    Scans a document chunk-by-chunk, applies robust regex matching, 
-    and handles overlap buffers to ensure no phrases are missed across page breaks.
-    
     Args:
-        document_id (str): Identifier for logging (usually the filename).
-        page_iterator (iterator): Generator yielding text strings from the document.
-        phrases_to_find (list): List of strings to search for.
-        overlap_size (int): Number of characters to carry over to the next chunk.
-        
+        document_id (str): Identifier for logging.
+        page_iterator (iterator): Generator yielding text chunks.
+        search_dict (dict): A mapping of {Category_Name: [list_of_phrases]}
+        overlap_size (int): Number of characters to carry over.
     Returns:
-        dict: A mapping of {phrase: boolean_result}
+        dict: A mapping of {Category_Name: boolean_result}
     """
-    # Use a set for pending phrases for O(1) removals and performance
-    pending_phrases = set(phrases_to_find)
+    # The tracking is for the keywords (categories), not the individual words.
+    pending_keys = set(search_dict.keys())
+    results = {key: False for key in search_dict.keys()}
     overlap_buffer = ""
     
-    # Initialize all phrases as False
-    results = {phrase: False for phrase in phrases_to_find}
-    
     for page_number, current_page_text in enumerate(page_iterator, start=1):
-        print(f"\n[DEBUG] Text found on page {page_number}:")
-        print(f"'{current_page_text}'")
-        # Short-circuit: Stop processing the file if all phrases have been found
-        if not pending_phrases:
-            # All phrases found, no need to keep reading/OCR-ing the rest of the file
-            break
+        if not pending_keys:
+            break # All categories found, you can finish the scan
             
-        # Combine the end of the previous page (buffer) with the current page text
         text_to_search = overlap_buffer + current_page_text
         found_in_this_page = set()
         
-        for phrase in pending_phrases:
-            # Build the regex for the current phrase
-            pattern = _build_robust_pattern(phrase)
-            
-            # Check for a match
-            if pattern.search(text_to_search):
-                results[phrase] = True
-                found_in_this_page.add(phrase)
+        for key in pending_keys:
+            #Go through all phrases associated with the specific category or word
+            for phrase in search_dict[key]:
+                pattern = _build_robust_pattern(phrase)
+                if pattern.search(text_to_search):
+                    results[key] = True
+                    found_in_this_page.add(key)
+                    break #Once we have found one phrase, the category is checked, moving to the next one.
         
-        # Remove found phrases from the pending set so we don't search for them again
-        pending_phrases -= found_in_this_page
+        pending_keys -= found_in_this_page
         
-        # Update the overlap buffer: take the last X characters of the current page
-        # This ensures phrases split between pages (e.g., 'בית' on p.1 and 'אדום' on p.2) are caught
         if len(current_page_text) > overlap_size:
             overlap_buffer = current_page_text[-overlap_size:]
         else:
             overlap_buffer = current_page_text
             
     return results
+
+def check_subject_relevance(text, subject_header, keyword):
+    """
+    Checks for the dynamic subject header and the target keyword.
+    Returns: (subject_found, keyword_found)
+    """
+    # Build regex for the dynamic header 
+    subject_pattern = _build_robust_pattern(subject_header)
+    match = subject_pattern.search(text)
+    
+    if not match:
+        return False, False
+        
+    # Search within a 500-character buffer after the header
+    start_idx = match.end()
+    search_area = text[start_idx : start_idx + 500]
+    
+    # Build regex for the required keyword (e.g., "דחוף")
+    keyword_pattern = _build_robust_pattern(keyword)
+    if keyword_pattern.search(search_area):
+        return True, True
+        
+    return True, False
