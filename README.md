@@ -115,4 +115,3 @@ python main.py
 
 
 *(Note: Any Kubernetes deployment files found in the `k8s/` directory are maintained separately and are not required to run the Python application locally).*
-```
